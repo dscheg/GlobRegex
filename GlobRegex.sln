@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlobRegex", "GlobRegex\GlobRegex.csproj", "{7637B354-D7A5-4859-AC29-A3CD9EEEC8ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlobRegex.Tests", "GlobRegex.Tests\GlobRegex.Tests.csproj", "{28B73FAD-63D5-430D-9509-26C60EE9C2EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlobRegex.Benchmarks", "GlobRegex.Benchmarks\GlobRegex.Benchmarks.csproj", "{8AB1C7F1-E915-4F34-8A52-5E5D8F6C6165}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7637B354-D7A5-4859-AC29-A3CD9EEEC8ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7637B354-D7A5-4859-AC29-A3CD9EEEC8ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7637B354-D7A5-4859-AC29-A3CD9EEEC8ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7637B354-D7A5-4859-AC29-A3CD9EEEC8ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28B73FAD-63D5-430D-9509-26C60EE9C2EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28B73FAD-63D5-430D-9509-26C60EE9C2EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28B73FAD-63D5-430D-9509-26C60EE9C2EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28B73FAD-63D5-430D-9509-26C60EE9C2EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AB1C7F1-E915-4F34-8A52-5E5D8F6C6165}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AB1C7F1-E915-4F34-8A52-5E5D8F6C6165}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AB1C7F1-E915-4F34-8A52-5E5D8F6C6165}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AB1C7F1-E915-4F34-8A52-5E5D8F6C6165}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
