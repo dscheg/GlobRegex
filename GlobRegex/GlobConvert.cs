@@ -24,11 +24,11 @@ public static class GlobConvert
     /// </summary>
     /// <param name="glob">The wildcard pattern; '?', '*', '**/', '**', '*.' patterns are supported:
     /// <list type="bullet">
-    /// <item><description><c>'?'</c> &ndash; any single character except the path separator</description></item>
-    /// <item><description><c>'*'</c> &ndash; any number of any characters except the path separator</description></item>
-    /// <item><description><c>'**/'</c> &ndash; zero or more path segments ending with the path separator</description></item>
-    /// <item><description><c>'**'</c> &ndash; equivalent of <c>'**/*'</c>, only valid at the beginning of the segment</description></item>
-    /// <item><description><c>'*.'</c> &ndash; when used at the end of a glob changes the behavior of the wildcards of the last
+    /// <item><description><c>'?'</c> – any single character except the path separator</description></item>
+    /// <item><description><c>'*'</c> – any number of any characters except the path separator</description></item>
+    /// <item><description><c>'**/'</c> – zero or more path segments ending with the path separator</description></item>
+    /// <item><description><c>'**'</c> – equivalent of <c>'**/*'</c>, only valid at the beginning of the segment</description></item>
+    /// <item><description><c>'*.'</c> – when used at the end of a glob changes the behavior of the wildcards of the last
     /// segment of the path in order to not include a dot, i.e. allows to match file system entries without extension</description></item>
     /// </list>
     /// </param>
@@ -36,11 +36,11 @@ public static class GlobConvert
     /// <returns>A <c>Glob</c> with the following properties:<br/>
     /// <list type="bullet">
     /// <item><description>
-    /// <c>BasePath</c> &ndash; the prefix of the original glob ending with path separator which doesn't contain any wildcard.
+    /// <c>BasePath</c> – the prefix of the original glob ending with path separator which doesn't contain any wildcard.
     /// This prefix can be used to determine the starting directory for a recursive directory traversal. <c>BasePath</c>
     /// can be empty if the glob starts with a wildcard segment or a globstar
     /// </description></item>
-    /// <item><description><c>RegexPattern</c> &ndash; the regular expression pattern for the glob</description></item>
+    /// <item><description><c>RegexPattern</c> – the regular expression pattern for the glob</description></item>
     /// </list>
     /// </returns>
     /// <exception cref="ArgumentNullException">input glob is null</exception>
@@ -76,20 +76,20 @@ public static class GlobConvert
     /// </summary>
     /// <param name="glob">The wildcard pattern; '?', '*', '**/', '**', '*.' patterns are supported:
     /// <list type="bullet">
-    /// <item><description><c>'?'</c> &ndash; any single character except the path separator</description></item>
-    /// <item><description><c>'*'</c> &ndash; any number of any characters except the path separator</description></item>
-    /// <item><description><c>'**/'</c> &ndash; zero or more path segments ending with the path separator</description></item>
-    /// <item><description><c>'**'</c> &ndash; equivalent of <c>'**/*'</c>, only valid at the beginning of the segment</description></item>
-    /// <item><description><c>'*.'</c> &ndash; when used at the end of a glob changes the behavior of the wildcards of the last
+    /// <item><description><c>'?'</c> – any single character except the path separator</description></item>
+    /// <item><description><c>'*'</c> – any number of any characters except the path separator</description></item>
+    /// <item><description><c>'**/'</c> – zero or more path segments ending with the path separator</description></item>
+    /// <item><description><c>'**'</c> – equivalent of <c>'**/*'</c>, only valid at the beginning of the segment</description></item>
+    /// <item><description><c>'*.'</c> – when used at the end of a glob changes the behavior of the wildcards of the last
     /// segment of the path in order to not include a dot, i.e. allows to match file system entries without extension</description></item>
     /// </list>
     /// </param>
     /// <param name="options">A bitwise combination of the enumeration values that changes the conversion process</param>
     /// <returns>A lazy enumerable of <c>GlobPart</c> items with the following properties:<br/>
     /// <list type="bullet">
-    /// <item><description><c>Raw</c> &ndash; the original part (segment, globstar or path separator) of the input glob string</description></item>
-    /// <item><description><c>Type</c> &ndash; the type of the part</description></item>
-    /// <item><description><c>RegexPattern</c> &ndash; the regular expression pattern for the part</description></item>
+    /// <item><description><c>Raw</c> – the original part (segment, globstar or path separator) of the input glob string</description></item>
+    /// <item><description><c>Type</c> – the type of the part</description></item>
+    /// <item><description><c>RegexPattern</c> – the regular expression pattern for the part</description></item>
     /// </list>
     /// </returns>
     /// <exception cref="ArgumentNullException">input glob is null</exception>

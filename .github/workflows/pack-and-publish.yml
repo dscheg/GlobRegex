@@ -1,0 +1,17 @@
+name: Pack and publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    uses: ./.github/workflows/build-and-test.yml
+  pack-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: build-and-test
+    steps:
+      - name: Pack
+        run: dotnet pack --configuration Release --output ./
+      - name: Publish Nuget package
+        run: dotnet nuget push *.nupkg --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
