@@ -14,5 +14,5 @@ public class Program
 
     [Benchmark]
     public void ToRegexPattern()
-        => GlobConvert.ToRegexPattern("/home/user/sources/test??/*/files_*/**/*.");
+        => GlobConvert.ToRegexPattern("/home/user/sources/test??/*/files_*/**/*.", (GlobRegexOptions)(~0));
 }

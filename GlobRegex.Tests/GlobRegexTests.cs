@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GlobRegex;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GlobRegex.Tests;
@@ -13,7 +13,54 @@ namespace GlobRegex.Tests;
 public class GlobRegexTests
 {
     [TestMethod]
-    /*       INPUT glob           EXPECTED path        EXPECTED regex       */
+    //       INPUT glob           EXPECTED parts
+    [DataRow(@"")]
+    [DataRow(@"**/",              "G:**/")]
+    [DataRow(@"**",               "W:**")]
+    [DataRow(@"**ab.c",           "W:**ab.c")]
+    [DataRow(@"**/ab.c",          "G:**/", "P:ab.c")]
+    [DataRow(@"**/**.",           "G:**/", "W:**.")]
+    [DataRow(@"**/**/a/**/**.",   "G:**/", "G:**/", "P:a", "S:/", "G:**/", "W:**.")]
+    public void TestToRegexPatternPartsZeroOptions(string glob, params string[] parts)
+        => AssertParts(GlobConvert.ToRegexPatternParts(glob, 0).ToList(), parts);
+
+    [TestMethod]
+    //       INPUT glob           EXPECTED parts
+    [DataRow(@"")]
+    [DataRow(@"/",                "S:/")]
+    [DataRow(@"a",                "P:a")]
+    [DataRow(@"?",                "W:?")]
+    [DataRow(@"*",                "W:*")]
+    [DataRow(@"**/",              "G:**/")]
+    [DataRow(@"**",               "G:*", "W:*")]
+    [DataRow(@"?.",               "W:?.")]
+    [DataRow(@"*.",               "W:*.")]
+    [DataRow(@"///",              "S:/", "S:/", "S:/")]
+    [DataRow(@"a/b/c/",           "P:a", "S:/", "P:b", "S:/", "P:c", "S:/")]
+    [DataRow(@"/a/b/c",           "S:/", "P:a", "S:/", "P:b", "S:/", "P:c")]
+    [DataRow(@"/a/b**c",          "S:/", "P:a", "S:/", "W:b**c")]
+    [DataRow(@"**ab.c",           "G:*", "W:*ab.c")]
+    [DataRow(@"**/ab.c",          "G:**/", "P:ab.c")]
+    [DataRow(@"**/**.",           "G:**/", "G:*", "W:*.")]
+    [DataRow(@"**/**/a/**/**.",   "G:**/", "G:**/", "P:a", "S:/", "G:**/", "G:*", "W:*.")]
+    public void TestToRegexPatternPartsAllOptions(string glob, params string[] parts)
+        => AssertParts(GlobConvert.ToRegexPatternParts(glob, (GlobRegexOptions)(~0)).ToList(), parts);
+
+    private void AssertParts(IList<GlobPart> result, string[] parts)
+    {
+        Assert.IsTrue(parts.Select(part => part.Split(':')[1]).SequenceEqual(result.Select(part => part.Raw)));
+        Assert.IsTrue(parts.Select(part => part.Split(':')[0] switch
+        {
+            "S" => GlobPartType.PathSeparator,
+            "W" => GlobPartType.Wildcard,
+            "G" => GlobPartType.Globstar,
+            "P" => GlobPartType.Plain,
+            _   => default
+        }).SequenceEqual(result.Select(part => part.Type)));
+    }
+
+    [TestMethod]
+    //       INPUT glob           EXPECTED path        EXPECTED regex
     [DataRow(@"",                 @"",                 @"^(?<stem>)$")]
     [DataRow(@"/",                @"/",                @"^[/\\](?<stem>)$")]
     [DataRow(@"\",                @"\",                @"^[/\\](?<stem>)$")]
@@ -24,12 +71,12 @@ public class GlobRegexTests
     [DataRow(@"/a/b",             @"/a/",              @"^[/\\]a[/\\](?<stem>b)$")]
     [DataRow(@"a/b/",             @"a/b/",             @"^a[/\\]b[/\\](?<stem>)$")]
     [DataRow(@"/a/b/",            @"/a/b/",            @"^[/\\]a[/\\]b[/\\](?<stem>)$")]
-    /*       INPUT glob           EXPECTED path        EXPECTED regex       */
+    //       INPUT glob           EXPECTED path        EXPECTED regex
     [DataRow(@"///",              @"///",              @"^[/\\][/\\][/\\](?<stem>)$")]
     [DataRow(@"\\\",              @"\\\",              @"^[/\\][/\\][/\\](?<stem>)$")]
     [DataRow(@"\/\",              @"\/\",              @"^[/\\][/\\][/\\](?<stem>)$")]
     [DataRow(@"/\/",              @"/\/",              @"^[/\\][/\\][/\\](?<stem>)$")]
-    /*       INPUT glob           EXPECTED path        EXPECTED regex       */
+    //       INPUT glob           EXPECTED path        EXPECTED regex
     [DataRow(@" ",                @"",                 @"^(?<stem>\ )$")]
     [DataRow("\t",                @"",                 @"^(?<stem>\t)$")]
     [DataRow("\r\n",              @"",                 @"^(?<stem>\r\n)$")]
@@ -42,14 +89,14 @@ public class GlobRegexTests
     [DataRow(@"\^$(+[{\",         @"\^$(+[{\",         @"^[/\\]\^\$\(\+\[\{[/\\](?<stem>)$")]
     [DataRow(@"a+b/c+d",          @"a+b/",             @"^a\+b[/\\](?<stem>c\+d)$")]
     [DataRow(@"a+b\c+d",          @"a+b\",             @"^a\+b[/\\](?<stem>c\+d)$")]
-    /*       INPUT glob           EXPECTED path        EXPECTED regex       */
+    //       INPUT glob           EXPECTED path        EXPECTED regex
     [DataRow(@"?",                @"",                 @"^(?<stem>[^/\\])$")]
     [DataRow(@"/?/",              @"/",                @"^[/\\](?<stem>[^/\\][/\\])$")]
     [DataRow(@"\?\",              @"\",                @"^[/\\](?<stem>[^/\\][/\\])$")]
     [DataRow(@"a?b",              @"",                 @"^(?<stem>a[^/\\]b)$")]
     [DataRow(@"???",              @"",                 @"^(?<stem>[^/\\][^/\\][^/\\])$")]
     [DataRow(@"?.c",              @"",                 @"^(?<stem>[^/\\]\.c)$")]
-    /*       INPUT glob           EXPECTED path        EXPECTED regex       */
+    //       INPUT glob           EXPECTED path        EXPECTED regex
     [DataRow(@"*",                @"",                 @"^(?<stem>[^/\\]*)$")]
     [DataRow(@".*",               @"",                 @"^(?<stem>\.[^/\\]*)$")]
     [DataRow(@"*.*",              @"",                 @"^(?<stem>[^/\\]*\.[^/\\]*)$")]
@@ -63,9 +110,9 @@ public class GlobRegexTests
     [DataRow(@"a*b\c*d",          @"",                 @"^(?<stem>a[^/\\]*b[/\\]c[^/\\]*d)$")]
     [DataRow(@"/a/*/b/*.c",       @"/a/",              @"^[/\\]a[/\\](?<stem>[^/\\]*[/\\]b[/\\][^/\\]*\.c)$")]
     [DataRow(@"\a\*\b\*.c",       @"\a\",              @"^[/\\]a[/\\](?<stem>[^/\\]*[/\\]b[/\\][^/\\]*\.c)$")]
-    /*       INPUT glob           EXPECTED path        EXPECTED regex       */
+    //       INPUT glob           EXPECTED path        EXPECTED regex
     [DataRow(@".",                @"",                 @"^(?<stem>\.)$")]
-    [DataRow(@"a.",               @"",                 @"^(?<stem>a)$")]
+    [DataRow(@"a.",               @"",                 @"^(?<stem>a\.)$")]
     [DataRow(@"/.",               @"/",                @"^[/\\](?<stem>\.)$")]
     [DataRow(@"\.",               @"\",                @"^[/\\](?<stem>\.)$")]
     [DataRow(@"?.",               @"",                 @"^(?<stem>[^/\\.])$")]
@@ -75,7 +122,7 @@ public class GlobRegexTests
     [DataRow(@"***.",             @"",                 @"^(?<stem>(?:[^/\\]*[/\\])*[^/\\.]*)$")]
     [DataRow(@"/a/*./b/?c*.",     @"/a/",              @"^[/\\]a[/\\](?<stem>[^/\\]*\.[/\\]b[/\\][^/\\.]c[^/\\.]*)$")]
     [DataRow(@"\a\*.\b\?c*.",     @"\a\",              @"^[/\\]a[/\\](?<stem>[^/\\]*\.[/\\]b[/\\][^/\\.]c[^/\\.]*)$")]
-    /*       INPUT glob           EXPECTED path        EXPECTED regex       */
+    //       INPUT glob           EXPECTED path        EXPECTED regex
     [DataRow(@"**",               @"",                 @"^(?<stem>(?:[^/\\]*[/\\])*[^/\\]*)$")]
     [DataRow(@"***",              @"",                 @"^(?<stem>(?:[^/\\]*[/\\])*[^/\\]*)$")]
     [DataRow(@"**.c",             @"",                 @"^(?<stem>(?:[^/\\]*[/\\])*[^/\\]*\.c)$")]
@@ -106,12 +153,12 @@ public class GlobRegexTests
     [DataRow(@"a\**\b\**\c",      @"a\",               @"^a[/\\](?<stem>(?:[^/\\]*[/\\])*b[/\\](?:[^/\\]*[/\\])*c)$")]
     [DataRow(@"**a**",            @"",                 @"^(?<stem>(?:[^/\\]*[/\\])*[^/\\]*a[^/\\]*)$")]
     [DataRow(@"**a*b**",          @"",                 @"^(?<stem>(?:[^/\\]*[/\\])*[^/\\]*a[^/\\]*b[^/\\]*)$")]
-    /*       INPUT glob           EXPECTED path        EXPECTED regex       */
+    //       INPUT glob           EXPECTED path        EXPECTED regex
     [DataRow(@"**/?a*b?/??c*.",   @"",                 @"^(?<stem>(?:[^/\\]*[/\\])*[^/\\]a[^/\\]*b[^/\\][/\\][^/\\.][^/\\.]c[^/\\.]*)$")]
     [DataRow(@"**\?a*b?\??c*.",   @"",                 @"^(?<stem>(?:[^/\\]*[/\\])*[^/\\]a[^/\\]*b[^/\\][/\\][^/\\.][^/\\.]c[^/\\.]*)$")]
     public void TestRegexConversion(string glob, string path, string regex)
     {
-        var result = GlobConvert.ToRegexPattern(glob);
+        var result = GlobConvert.ToRegexPattern(glob, (GlobRegexOptions)(~0));
         Assert.AreEqual(path, result.BasePath);
         Assert.AreEqual(regex, result.RegexPattern);
     }
@@ -214,7 +261,7 @@ public class GlobRegexTests
     [DataRow(@"\\a\b?\**\**\*.",  @"\\a\b0\x\y\z\1",   @"\\a\",             @"b0\x\y\z\1")]
     public void TestMatch(string glob, string input, string path, string stem)
     {
-        var result = GlobConvert.ToRegexPattern(glob);
+        var result = GlobConvert.ToRegexPattern(glob, (GlobRegexOptions)(~0));
         Assert.AreEqual(path, result.BasePath);
         var match = Regex.Match(input, result.RegexPattern);
         Assert.IsTrue(match.Success);
@@ -293,11 +340,56 @@ public class GlobRegexTests
     [DataRow("/a?/**/b*c/*.",     @"/aa/bc/.c")]
     [DataRow("/a?/**/b*c/*.",     @"c:/aa/bc/1")]
     public void TestNotMatch(string glob, string input)
-        => Assert.IsFalse(Regex.IsMatch(input, GlobConvert.ToRegexPattern(glob).RegexPattern));
+        => Assert.IsFalse(Regex.IsMatch(input, GlobConvert.ToRegexPattern(glob, (GlobRegexOptions)(~0)).RegexPattern));
+
+    [TestMethod]
+    public void TestMathFullStringOption()
+    {
+        Assert.ThrowsException<ArgumentNullException>(() => GlobConvert.ToRegexPatternParts(null, GlobRegexOptions.MatchFullString));
+
+        var pattern = GlobConvert.ToRegexPattern("/a?b/*.c", ~GlobRegexOptions.MatchFullString).RegexPattern;
+        Assert.IsFalse(pattern.StartsWith('^'));
+        Assert.IsFalse(pattern.EndsWith('$'));
+
+        pattern = GlobConvert.ToRegexPattern("/a?b/*.c", GlobRegexOptions.MatchFullString).RegexPattern;
+        Assert.IsTrue(pattern.StartsWith('^'));
+        Assert.IsTrue(pattern.EndsWith('$'));
+    }
+
+    [TestMethod]
+    public void TestJoinedRawPartsEqualInputGlobFuzzing()
+    {
+        var rnd = new Random(1337);
+        foreach(var glob in Enumerable.Range(0, 20000).Select(_ => RandomGlob(rnd)))
+        {
+            var parts = GlobConvert.ToRegexPatternParts(glob, (GlobRegexOptions)(~0));
+            Assert.AreEqual(glob, string.Concat(parts.Select(part => part.Raw)));
+        }
+    }
+
+    [TestMethod]
+    public void TestResultRegexMatchInputGlobFuzzing()
+    {
+        var rnd = new Random(1337);
+        foreach(var glob in Enumerable.Range(0, 20000).Select(_ => RandomGlob(rnd)))
+        {
+            var regex = new Regex(GlobConvert.ToRegexPattern(glob, ~GlobRegexOptions.WildcardsWithTrailingDotMatchNoExtension).RegexPattern, RegexOptions.CultureInvariant);
+            Assert.IsTrue(regex.IsMatch(glob));
+        }
+    }
+
+    private string RandomGlob(Random rnd, int length = 20)
+    {
+        const string alphabet = @"/\a?*.";
+        Span<char> span = stackalloc char[rnd.Next(length)];
+        for(int i = 0; i < span.Length; i++)
+            span[i] = alphabet[rnd.Next(alphabet.Length)];
+        return span.ToString();
+    }
 
     [TestMethod]
     //       INPUT                EXPECTED
-    [DataRow("",                  new object[0])]
+    [DataRow("")]
     [DataRow("/",                 "/")]
     [DataRow("//",                "/", "/")]
     [DataRow("/|/",               "/", "|", "/")]

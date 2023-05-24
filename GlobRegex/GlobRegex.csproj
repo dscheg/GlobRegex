@@ -14,8 +14,8 @@
 
     <PropertyGroup Label="Package">
         <PackageId>GlobRegex</PackageId>
-        <Version>0.9.1</Version>
-        <Authors>dscheg</Authors>
+        <Version>1.0.0</Version>
+        <Authors>Dmitriy Titarenko</Authors>
         <Description>Glob to Regex conversion library for .NET</Description>
         <PackageTags>glob globbing regex regular expression pattern match</PackageTags>
         <Copyright>Copyright © Dmitriy Titarenko 2023</Copyright>
@@ -23,7 +23,6 @@
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
         <EnablePackageValidation>true</EnablePackageValidation>
-        <PackageValidationBaselineVersion>0.9.0</PackageValidationBaselineVersion>
     </PropertyGroup>
 
     <ItemGroup>
