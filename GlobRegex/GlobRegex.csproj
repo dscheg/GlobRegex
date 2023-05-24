@@ -23,6 +23,7 @@
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
         <EnablePackageValidation>true</EnablePackageValidation>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -32,6 +33,7 @@
 
     <ItemGroup>
         <None Include="../LICENSE" Pack="true" PackagePath="lib/" />
+        <None Include="../README.md" Pack="true" PackagePath="/" />
     </ItemGroup>
 
 </Project>
