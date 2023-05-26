@@ -22,17 +22,17 @@ The following patterns are supported:
 
 | Pattern | Description | Example |
 |:-------:| ----------- | ------- |
-| `?`     | Any single character except the path separator | `202305??.log` |
-| `*`     | Zero or more of any characters except the path separator | `src/*.md` |
-| `**/`   | Zero or more path segments ending with the path separator | `**/bin/` |
+| `?`     | Any single character except the directory separator | `202305??.log` |
+| `*`     | Zero or more of any characters except the directory separator | `src/*.md` |
+| `**/`   | Zero or more path segments ending with the directory separator | `**/bin/` |
 | `**`    | Equivalent of `**/*`, only valid at the **beginning of the segment**, if it occurs not at the beginning of the segment it is interpreted as consecutive `*` | `**`, `**.cs` |
 | `*.`    | Trailing dot changes the behavior of the wildcards (`?`, `*`, `**`) of the **last segment** of the path to not include a dot, i.e. allows to match file system entries without extension. If there are no wildcards in the last segment, the trailing dot is treated as a regular character | `test/*.`, `split/x?a.` |
 
-Both `/` and `\` are treated as path separator characters. So `**/*` is the same as `**\*`.
+Both `/` and `\` are treated as directory separator characters. So `**/*` is the same as `**\*`.
 Consecutive `*` after `**` (and `*` if not at the beginning of the segment) are ignored. So `***/abc***` is the same as `**/abc*`.
 Escaping of wildcard characters is not supported.
 
-The passed glob is not normalized, in particular `./` and `../`, consecutive path separators like `//` or `\\`, etc. processed literally. `./` and `../` in normal use are expected to appear only in the `BasePath` and can be normalized afterwards. `Path.GetRelativePath` method used in the usage example above resolve paths by calling the `GetFullPath` method before calculating the difference.
+The passed glob is not normalized, in particular `./` and `../`, consecutive directory separators like `//` or `\\`, etc. processed literally. `./` and `../` in normal use are expected to appear only in the `BasePath` and can be normalized afterwards. In the usage example above `Path.GetRelativePath` method resolve paths by calling the `GetFullPath` normalization method before calculating the difference.
 
 ## Reproducible builds
 `GlobRegex` nuget package is built using [ReproducibleBuilds](https://github.com/dotnet/reproducible-builds) with the [SourceLink](https://github.com/dotnet/sourcelink). Reproducible builds give confidence by allowing to validate that the package has actually been built using public sources. To be able to reproduce a build, you need the source files, the referenced DLLs, the compiler version, and the compiler options (language version, defines, nullables, etc.). All this information is available using [Nuget Package Explorer](https://nuget.info/packages/GlobRegex). Or you can use [dotnet-validate](https://www.nuget.org/packages/dotnet-validate) tool to validate the package.

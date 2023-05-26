@@ -51,7 +51,7 @@ public class GlobRegexTests
         Assert.IsTrue(parts.Select(part => part.Split(':')[1]).SequenceEqual(result.Select(part => part.Raw)));
         Assert.IsTrue(parts.Select(part => part.Split(':')[0] switch
         {
-            "S" => GlobPartType.PathSeparator,
+            "S" => GlobPartType.Separator,
             "W" => GlobPartType.Wildcard,
             "G" => GlobPartType.Globstar,
             "P" => GlobPartType.Plain,

@@ -19,15 +19,15 @@ public static class GlobConvert
     /// are wrapped in a named matched subexpression <c>(?&lt;stem&gt;...)</c>, the captured value of this named group can
     /// be used to determine the relative path. Stem can be empty if the glob contains no wildcards. Additionally the base
     /// path is returned, relative to which the relative path is calculated.
-    /// <para>The passed glob is not normalized, in particular <c>./</c> and <c>../</c>, consecutive path separators like
+    /// <para>The passed glob is not normalized, in particular <c>./</c> and <c>../</c>, consecutive directory separators like
     /// <c>//</c> or <c>\\</c>, etc. processed literally. Usually <c>./</c> and <c>../</c> are expected to appear only in
     /// the `BasePath` and can be normalized afterwards by using for example <c>Path.GetFullPath</c></para>
     /// </summary>
     /// <param name="glob">The wildcard pattern; '?', '*', '**/', '**', '*.' patterns are supported:
     /// <list type="bullet">
-    /// <item><description><c>'?'</c> – any single character except the path separator</description></item>
-    /// <item><description><c>'*'</c> – any number of any characters except the path separator</description></item>
-    /// <item><description><c>'**/'</c> – zero or more path segments ending with the path separator</description></item>
+    /// <item><description><c>'?'</c> – any single character except the directory separator</description></item>
+    /// <item><description><c>'*'</c> – any number of any characters except the directory separator</description></item>
+    /// <item><description><c>'**/'</c> – zero or more path segments ending with the directory separator</description></item>
     /// <item><description><c>'**'</c> – equivalent of <c>'**/*'</c>, only valid at the beginning of the segment</description></item>
     /// <item><description><c>'*.'</c> – trailing dot changes the behavior of the wildcards of the last segment of the path
     /// in order to not include a dot, i.e. allows to match file system entries without extension</description></item>
@@ -37,7 +37,7 @@ public static class GlobConvert
     /// <returns>A <c>Glob</c> with the following properties:<br/>
     /// <list type="bullet">
     /// <item><description>
-    /// <c>BasePath</c> – the prefix of the original glob ending with path separator which doesn't contain any wildcard.
+    /// <c>BasePath</c> – the prefix of the original glob ending with directory separator which doesn't contain any wildcard.
     /// This prefix can be used to determine the starting directory for a recursive directory traversal. <c>BasePath</c>
     /// can be empty if the glob starts with a wildcard segment or a globstar
     /// </description></item>
@@ -51,7 +51,7 @@ public static class GlobConvert
 
         int baseCount = 0;
         for(int i = 0; i < parts.Count && parts[i].Type is not (GlobPartType.Globstar or GlobPartType.Wildcard); i++)
-            baseCount = parts[i].Type == GlobPartType.PathSeparator ? i + 1 : baseCount;
+            baseCount = parts[i].Type == GlobPartType.Separator ? i + 1 : baseCount;
 
         IEnumerable<string> stemRegexParts = parts.Skip(baseCount).Select(part => part.RegexPattern).ToList();
         var regexParts = parts.Take(baseCount).Select(part => part.RegexPattern)
@@ -75,16 +75,16 @@ public static class GlobConvert
 
     /// <summary>
     /// Splits an input glob to parts and converts each part into a regular expression pattern. The returned collection
-    /// contains as items both path segments and path separators
+    /// contains as items both path segments and directory separators
     /// <example>
     /// "src/test/**/bin/*.json" => "src", "/", "test", "**/", "bin", "/", "*.json"
     /// </example>
     /// </summary>
     /// <param name="glob">The wildcard pattern; '?', '*', '**/', '**', '*.' patterns are supported:
     /// <list type="bullet">
-    /// <item><description><c>'?'</c> – any single character except the path separator</description></item>
-    /// <item><description><c>'*'</c> – any number of any characters except the path separator</description></item>
-    /// <item><description><c>'**/'</c> – zero or more path segments ending with the path separator</description></item>
+    /// <item><description><c>'?'</c> – any single character except the directory separator</description></item>
+    /// <item><description><c>'*'</c> – any number of any characters except the directory separator</description></item>
+    /// <item><description><c>'**/'</c> – zero or more path segments ending with the directory separator</description></item>
     /// <item><description><c>'**'</c> – equivalent of <c>'**/*'</c>, only valid at the beginning of the segment</description></item>
     /// <item><description><c>'*.'</c> – trailing dot changes the behavior of the wildcards of the last segment of the path
     /// in order to not include a dot, i.e. allows to match file system entries without extension</description></item>
@@ -93,7 +93,7 @@ public static class GlobConvert
     /// <param name="options">A bitwise combination of the enumeration values that changes the conversion process</param>
     /// <returns>A lazy enumerable of <c>GlobPart</c> items with the following properties:<br/>
     /// <list type="bullet">
-    /// <item><description><c>Raw</c> – the original part (segment, globstar or path separator) of the input glob string</description></item>
+    /// <item><description><c>Raw</c> – the original part (segment, globstar or directory separator) of the input glob string</description></item>
     /// <item><description><c>Type</c> – the type of the part</description></item>
     /// <item><description><c>RegexPattern</c> – the regular expression pattern for the part</description></item>
     /// </list>
@@ -105,19 +105,19 @@ public static class GlobConvert
             throw new ArgumentNullException(nameof(glob));
 
         var noExt = (options & GlobRegexOptions.WildcardsWithTrailingDotMatchNoExtension) != 0 && glob.EndsWith(".", StringComparison.Ordinal);
-        var parts = SplitLazy(glob, PathSeparators)
-            // combine '**' and the following path separator to a single globstar item '**/'
+        var parts = SplitLazy(glob, DirectorySeparators)
+            // combine '**' and the following directory separator to a single globstar item '**/'
             .GroupAdjacent((prev, curr) => prev.Value.Length >= 2 && prev.Value.HasOnly('*') && curr.IsSeparator)
             .Select(part => part.Count == 2
                 ? (Raw: part.First.Value + part.Last.Value, part.First.IsLast, Type: GlobPartType.Globstar)
                 : (Raw: part.Last.Value, part.Last.IsLast, Type: part.First.IsSeparator
-                    ? GlobPartType.PathSeparator
+                    ? GlobPartType.Separator
                     : part.Last.Value.HasAny(GlobSpecialChars)
                         ? GlobPartType.Wildcard
                         : GlobPartType.Plain));
 
         // split the segment prefixed '**' into a Globstar and '*suffix'
-        if((options & GlobRegexOptions.AllowGlobstarPrefixWithoutPathSeparator) != 0)
+        if((options & GlobRegexOptions.AllowGlobstarWithoutDirectorySeparator) != 0)
             parts = parts.SelectMany(part => part.Type != GlobPartType.Globstar && part.Raw.TryGetGlobstarPrefix(out var prefix, out var suffix)
                 ? Yield(
                     (Raw: prefix, false, Type: GlobPartType.Globstar),
@@ -130,10 +130,10 @@ public static class GlobConvert
             Type = part.Type,
             RegexPattern = part.Type switch
             {
-                GlobPartType.PathSeparator => @"[/\\]",
-                GlobPartType.Globstar      => @"(?:[^/\\]*[/\\])*",
-                GlobPartType.Plain         => Regex.Escape(part.Raw),
-                GlobPartType.Wildcard      => string.Concat(SplitLazy(part.Raw, GlobSpecialChars, part.Raw.Length - (part.IsLast && noExt ? 1 : 0))
+                GlobPartType.Separator => @"[/\\]",
+                GlobPartType.Globstar  => @"(?:[^/\\]*[/\\])*",
+                GlobPartType.Plain     => Regex.Escape(part.Raw),
+                GlobPartType.Wildcard  => string.Concat(SplitLazy(part.Raw, GlobSpecialChars, part.Raw.Length - (part.IsLast && noExt ? 1 : 0))
                     .GroupAdjacent((prev, item) => prev.Value == "*" && item.Value == "*")
                     .Select(value => value.Last.Value switch
                     {
@@ -227,7 +227,7 @@ public static class GlobConvert
     }
 
     private static readonly char[] GlobSpecialChars = { '*', '?' };
-    private static readonly char[] PathSeparators = { '/', '\\' };
+    private static readonly char[] DirectorySeparators = { '/', '\\' };
 }
 
 /// <summary>A bitwise combination of the enumeration values that changes the conversion process</summary>
@@ -236,8 +236,9 @@ public enum GlobRegexOptions
 {
     /// <summary>Adds <c>'^'</c> to the beginning of the resulting regex pattern and <c>'$'</c> to the end</summary>
     MatchFullString = 1,
-    /// <summary>Allows segment <c>'**suffix'</c> to be interpreted as <c>globstar</c> + <c>'*suffix'</c></summary>
-    AllowGlobstarPrefixWithoutPathSeparator = 2,
+    /// <summary>Allows segment <c>'**suffix'</c> to be interpreted as <c>globstar</c> + <c>'*suffix'</c>, if <c>'**'</c>
+    /// occurs not at the beginning of the segment it is interpreted as consecutive <c>'*'</c></summary>
+    AllowGlobstarWithoutDirectorySeparator = 2,
     /// <summary>Trailing dot changes the behavior of the wildcards of the last segment of the path in order to not include
     /// a dot, i.e. allows to match file system entries without extension. If there are no wildcards in the last segment,
     /// the trailing dot is treated as a regular character</summary>
@@ -247,8 +248,8 @@ public enum GlobRegexOptions
 /// <summary>Type of the part of the glob</summary>
 public enum GlobPartType
 {
-    /// <summary>One or more consecutive '/' or '\' characters</summary>
-    PathSeparator = 1,
+    /// <summary>One or more consecutive directory separator characters ('/' or '\')</summary>
+    Separator = 1,
     /// <summary>A segment that contains one or more '*' or '?' characters</summary>
     Wildcard = 2,
     /// <summary>'**' or '**/' matching zero or more directories or subdirectories</summary>
@@ -261,7 +262,7 @@ public enum GlobPartType
 public struct Glob
 {
     /// <summary>
-    /// The prefix of the original glob ending with path separator which doesn't contain any wildcard. This prefix can be
+    /// The prefix of the original glob ending with directory separator which doesn't contain any wildcard. This prefix can be
     /// used to determine the starting directory for a recursive directory traversal. <c>BasePath</c> can be empty if the
     /// glob starts with a wildcard segment or a globstar
     /// </summary>
@@ -282,7 +283,7 @@ public struct Glob
 /// <summary>The part of the glob</summary>
 public struct GlobPart
 {
-    /// <summary>The original part (segment, globstar or path separator) of the input glob string</summary>
+    /// <summary>The original part (segment, globstar or directory separator) of the input glob string</summary>
     public string Raw { get; internal set; }
     /// <summary>The type of the part</summary>
     public GlobPartType Type { get; internal set; }
