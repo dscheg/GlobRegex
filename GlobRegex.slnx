@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="GlobRegex.Benchmarks/GlobRegex.Benchmarks.csproj" />
+  <Project Path="GlobRegex.Tests/GlobRegex.Tests.csproj" />
+  <Project Path="GlobRegex/GlobRegex.csproj" />
+</Solution>
