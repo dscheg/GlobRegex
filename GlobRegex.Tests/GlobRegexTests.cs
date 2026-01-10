@@ -1,11 +1,9 @@
 // SPDX-FileCopyrightText: (C) 2023 Dmitriy Titarenko https://github.com/dscheg
 // SPDX-License-Identifier: BSD-3-Clause
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+[assembly: Parallelize]
 
 namespace GlobRegex.Tests;
 
@@ -345,15 +343,15 @@ public class GlobRegexTests
     [TestMethod]
     public void TestMathFullStringOption()
     {
-        Assert.Throws<ArgumentNullException>(() => GlobConvert.ToRegexPatternParts(null, GlobRegexOptions.MatchFullString));
+        Assert.Throws<ArgumentNullException>(() => GlobConvert.ToRegexPatternParts(null!, GlobRegexOptions.MatchFullString));
 
         var pattern = GlobConvert.ToRegexPattern("/a?b/*.c", ~GlobRegexOptions.MatchFullString).RegexPattern;
-        Assert.IsFalse(pattern.StartsWith('^'));
-        Assert.IsFalse(pattern.EndsWith('$'));
+        Assert.DoesNotStartWith("^", pattern, StringComparison.Ordinal);
+        Assert.DoesNotEndWith("$", pattern, StringComparison.Ordinal);
 
         pattern = GlobConvert.ToRegexPattern("/a?b/*.c", GlobRegexOptions.MatchFullString).RegexPattern;
-        Assert.IsTrue(pattern.StartsWith('^'));
-        Assert.IsTrue(pattern.EndsWith('$'));
+        Assert.StartsWith("^", pattern, StringComparison.Ordinal);
+        Assert.EndsWith("$", pattern, StringComparison.Ordinal);
     }
 
     [TestMethod]
@@ -417,7 +415,6 @@ public class GlobRegexTests
 
     [TestMethod]
     //       INPUT                EXPECTED
-    [DataRow("",                  "")]
     [DataRow("",                  "")]
     [DataRow("a",                 "(a..a){1}")]
     [DataRow("abc",               "(a..a){1}(b..b){1}(c..c){1}")]
