@@ -345,7 +345,7 @@ public class GlobRegexTests
     [TestMethod]
     public void TestMathFullStringOption()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => GlobConvert.ToRegexPatternParts(null, GlobRegexOptions.MatchFullString));
+        Assert.Throws<ArgumentNullException>(() => GlobConvert.ToRegexPatternParts(null, GlobRegexOptions.MatchFullString));
 
         var pattern = GlobConvert.ToRegexPattern("/a?b/*.c", ~GlobRegexOptions.MatchFullString).RegexPattern;
         Assert.IsFalse(pattern.StartsWith('^'));
