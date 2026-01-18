@@ -11,7 +11,7 @@ public static class GlobConvert
     /// <summary>
     /// Converts an input glob to a regular expression pattern. All segments starting with the first containing wildcards
     /// are wrapped in a named matched subexpression <c>(?&lt;stem&gt;...)</c>, the captured value of this named group can
-    /// be used to determine the relative path. Stem can be empty if the glob contains no wildcards. Additionally the base
+    /// be used to determine the relative path. Stem can be empty if the glob contains no wildcards. Additionally, the base
     /// path is returned, relative to which the relative path is calculated.
     /// <para>The passed glob is not normalized, in particular <c>./</c> and <c>../</c>, consecutive directory separators like
     /// <c>//</c> or <c>\\</c>, etc. processed literally. Usually <c>./</c> and <c>../</c> are expected to appear only in
@@ -61,7 +61,14 @@ public static class GlobConvert
 
         return new Glob
         {
+            Flags = parts.Aggregate((GlobFlags)0, (current, part) => current | part.Type switch
+            {
+                GlobPartType.Wildcard => GlobFlags.HasWildcardSegments,
+                GlobPartType.Globstar => GlobFlags.HasGlobstarSegments,
+                _ => 0
+            }),
             BasePath = string.Concat(parts.Take(baseCount).Select(part => part.Raw)),
+            StemPath = string.Concat(parts.Skip(baseCount).Select(part => part.Raw)),
             RegexPattern = string.Concat(regexParts),
             StemRegexPattern = string.Concat(stemRegexParts)
         };
@@ -220,8 +227,8 @@ public static class GlobConvert
         return -1;
     }
 
-    private static readonly char[] GlobSpecialChars = { '*', '?' };
-    private static readonly char[] DirectorySeparators = { '/', '\\' };
+    private static readonly char[] GlobSpecialChars = ['*', '?'];
+    private static readonly char[] DirectorySeparators = ['/', '\\'];
 }
 
 /// <summary>A bitwise combination of the enumeration values that changes the conversion process</summary>
@@ -252,24 +259,45 @@ public enum GlobPartType
     Plain = 4
 }
 
+/// <summary>Characteristics of the glob conversion result</summary>
+[Flags]
+public enum GlobFlags
+{
+    /// <summary>Glob has segments interpreted as segments with wildcards <c>*</c> or <c>?</c></summary>
+    HasWildcardSegments = 1,
+    /// <summary>Glob has segments interpreted as segments with globstar <c>**</c></summary>
+    HasGlobstarSegments = 2
+}
+
 /// <summary>A conversion result</summary>
 public struct Glob
 {
     /// <summary>
+    /// Characteristics of the glob conversion result
+    /// </summary>
+    public GlobFlags Flags { get; internal set; }
+    /// <summary>
     /// The prefix of the original glob ending with directory separator which doesn't contain any wildcard. This prefix can be
     /// used to determine the starting directory for a recursive directory traversal. <c>BasePath</c> can be empty if the
-    /// glob starts with a wildcard segment or a globstar
+    /// glob contains no directory separators and globstars or if it starts with a wildcard segment or a globstar
     /// </summary>
     public string BasePath { get; internal set; }
     /// <summary>
+    /// The suffix of the original glob starting with the first segment containing wildcards or the last segment if the glob
+    /// contains no wildcards. Can be empty if the glob contains no wildcards and ends with directory separator
+    /// </summary>
+    public string StemPath { get; internal set; }
+    /// <summary>
     /// The regular expression pattern for the entire glob. All segments starting with the first containing wildcards
     /// are wrapped in a named matched subexpression <c>(?&lt;stem&gt;...)</c>, the captured value of this named group can
-    /// be used to determine the relative path. Stem can be empty if the glob contains no wildcards
+    /// be used to determine the relative path. Stem can be empty if the glob contains no wildcards and ends with directory
+    /// separator
     /// </summary>
     public string RegexPattern { get; internal set; }
     /// <summary>
-    /// The regular expression pattern for the stem part only. Stem starts with the first segment containing wildcards.
-    /// Stem regex pattern can be empty if the glob contains no wildcards
+    /// The regular expression pattern for the stem part only. Stem starts with the first segment containing wildcards or
+    /// the last segment if the glob contains no wildcards. Can be empty if the glob contains no wildcards and ends with
+    /// directory separator
     /// </summary>
     public string StemRegexPattern { get; internal set; }
 }

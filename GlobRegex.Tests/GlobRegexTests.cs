@@ -267,6 +267,27 @@ public class GlobRegexTests
     }
 
     [TestMethod]
+    //       INPUT glob     EXPECTED flags
+    [DataRow(@"",            (GlobFlags)0)]
+    [DataRow(@"a",           (GlobFlags)0)]
+    [DataRow(@"/",           (GlobFlags)0)]
+    [DataRow(@"a/b",         (GlobFlags)0)]
+    [DataRow(@"/*",          GlobFlags.HasWildcardSegments)]
+    [DataRow(@"a/*/c",       GlobFlags.HasWildcardSegments)]
+    [DataRow(@"a.?",         GlobFlags.HasWildcardSegments)]
+    [DataRow(@"a.b?c",       GlobFlags.HasWildcardSegments)]
+    [DataRow(@"**/a.txt",    GlobFlags.HasGlobstarSegments)]
+    [DataRow(@"/a/**/b.txt", GlobFlags.HasGlobstarSegments)]
+    [DataRow(@"**.txt",      GlobFlags.HasWildcardSegments | GlobFlags.HasGlobstarSegments)]
+    [DataRow(@"**.t?t",      GlobFlags.HasWildcardSegments | GlobFlags.HasGlobstarSegments)]
+    [DataRow(@"/a/**/*.txt", GlobFlags.HasWildcardSegments | GlobFlags.HasGlobstarSegments)]
+    public void TestFlags(string glob, GlobFlags flags)
+    {
+        var result = GlobConvert.ToRegexPattern(glob, (GlobRegexOptions)(~0));
+        Assert.AreEqual(flags, result.Flags);
+    }
+
+    [TestMethod]
     //       INPUT glob           INPUT string
     [DataRow("?",                 @"/")]
     [DataRow("?",                 @"\")]
