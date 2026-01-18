@@ -13,7 +13,7 @@
 
   <PropertyGroup Label="Package">
     <PackageId>GlobRegex</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Dmitriy Titarenko</Authors>
     <Description>Glob to Regex conversion library for .NET</Description>
     <PackageTags>glob globbing regex regular expression pattern match</PackageTags>
