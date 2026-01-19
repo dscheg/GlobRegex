@@ -17,7 +17,7 @@
     <Authors>Dmitriy Titarenko</Authors>
     <Description>Glob to Regex conversion library for .NET</Description>
     <PackageTags>glob globbing regex regular expression pattern match</PackageTags>
-    <Copyright>Copyright © Dmitriy Titarenko 2023</Copyright>
+    <Copyright>Copyright © Dmitriy Titarenko 2023-2026</Copyright>
     <PackageProjectUrl>https://github.com/dscheg/GlobRegex</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.102" PrivateAssets="All" />
     <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.39" PrivateAssets="All" />
   </ItemGroup>
 

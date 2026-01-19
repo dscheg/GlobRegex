@@ -38,6 +38,6 @@ The passed glob is not normalized, in particular `./` and `../`, consecutive dir
 `GlobRegex` nuget package is built using [ReproducibleBuilds](https://github.com/dotnet/reproducible-builds) with the [SourceLink](https://github.com/dotnet/sourcelink). Reproducible builds give confidence by allowing to validate that the package has actually been built using public sources. To be able to reproduce a build, you need the source files, the referenced DLLs, the compiler version, and the compiler options (language version, defines, nullables, etc.). All this information is available using [Nuget Package Explorer](https://nuget.info/packages/GlobRegex). Or you can use [dotnet-validate](https://www.nuget.org/packages/dotnet-validate) tool to validate the package.
 
 ## Author
-Copyright (c) Dmitriy [dscheg](https://github.com/dscheg) Titarenko 2023
+Copyright (c) Dmitriy [dscheg](https://github.com/dscheg) Titarenko 2023-2026
 
 **GlobRegex** is distributed under [BSD 3-Clause License](LICENSE)

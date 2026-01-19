@@ -268,10 +268,10 @@ public class GlobRegexTests
 
     [TestMethod]
     //       INPUT glob     EXPECTED flags
-    [DataRow(@"",            (GlobFlags)0)]
-    [DataRow(@"a",           (GlobFlags)0)]
-    [DataRow(@"/",           (GlobFlags)0)]
-    [DataRow(@"a/b",         (GlobFlags)0)]
+    [DataRow(@"",            GlobFlags.None)]
+    [DataRow(@"a",           GlobFlags.None)]
+    [DataRow(@"/",           GlobFlags.None)]
+    [DataRow(@"a/b",         GlobFlags.None)]
     [DataRow(@"/*",          GlobFlags.HasWildcardSegments)]
     [DataRow(@"a/*/c",       GlobFlags.HasWildcardSegments)]
     [DataRow(@"a.?",         GlobFlags.HasWildcardSegments)]

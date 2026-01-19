@@ -263,6 +263,8 @@ public enum GlobPartType
 [Flags]
 public enum GlobFlags
 {
+    /// <summary>No flags</summary>
+    None = 0,
     /// <summary>Glob has segments interpreted as segments with wildcards <c>*</c> or <c>?</c></summary>
     HasWildcardSegments = 1,
     /// <summary>Glob has segments interpreted as segments with globstar <c>**</c></summary>
