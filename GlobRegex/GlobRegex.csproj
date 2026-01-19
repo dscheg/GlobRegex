@@ -8,12 +8,14 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <Deterministic>true</Deterministic>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <PropertyGroup Label="Package">
     <PackageId>GlobRegex</PackageId>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <Authors>Dmitriy Titarenko</Authors>
     <Description>Glob to Regex conversion library for .NET</Description>
     <PackageTags>glob globbing regex regular expression pattern match</PackageTags>
