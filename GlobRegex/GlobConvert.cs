@@ -1,6 +1,9 @@
 ﻿// SPDX-FileCopyrightText: (C) 2023-2026 Dmitriy Titarenko https://github.com/dscheg
 // SPDX-License-Identifier: BSD-3-Clause
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace GlobRegex;
