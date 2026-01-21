@@ -32,7 +32,8 @@ Both `/` and `\` are treated as directory separator characters. So `**/*` is the
 Consecutive `*` after `**` (and `**` if not at the beginning of the segment) are treated as a single `*`. So `***/abc***` is the same as `**/abc*`.
 Escaping of wildcard characters is not supported.
 
-The passed glob is not normalized, in particular `./` and `../`, consecutive directory separators like `//` or `\\`, etc. processed literally. `./` and `../` in normal use are expected to appear only in the `BasePath` and can be normalized afterwards. In the usage example above `Path.GetRelativePath` method resolve paths by calling the `GetFullPath` normalization method before calculating the difference.
+## Security considerations
+The passed glob is not normalized, in particular `./` and `../`, consecutive directory separators like `//` or `\\`, etc. processed literally. So path parts should be normalized afterwards. In the usage example above `Path.GetRelativePath` method resolve paths by calling the `GetFullPath` normalization method under the hood before calculating the difference.
 
 ## Reproducible builds
 `GlobRegex` nuget package is built using [ReproducibleBuilds](https://github.com/dotnet/reproducible-builds) with the [SourceLink](https://github.com/dotnet/sourcelink). Reproducible builds give confidence by allowing to validate that the package has actually been built using public sources. To be able to reproduce a build, you need the source files, the referenced DLLs, the compiler version, and the compiler options (language version, defines, nullables, etc.). All this information is available using [Nuget Package Explorer](https://nuget.info/packages/GlobRegex). Or you can use [dotnet-validate](https://www.nuget.org/packages/dotnet-validate) tool to validate the package.
